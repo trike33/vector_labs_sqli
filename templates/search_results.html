@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="mb-4">Search Results for: "{{ query }}"</h1>
+
+            <a href="{{ url_for('index') }}" class="btn btn-secondary mb-4">Back to All Posts</a>
+
+            <!-- Blog Posts -->
+            {% if posts %}
+                {% for post in posts %}
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="card-title">{{ post[1] }}</h2>
+                        {# MODIFICATION: Check if post[4] (the date) exists before trying to format it #}
+                        {% if post[4] %}
+                        <h6 class="card-subtitle mb-2 text-muted">by {{ post[3] }} on {{ post[4].strftime('%Y-%m-%d') }}</h6>
+                        {% endif %}
+                        <p class="card-text">{{ post[2] }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-warning">No posts matched your search criteria.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
