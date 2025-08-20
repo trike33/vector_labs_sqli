@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="mb-4">Blog Posts</h1>
+
+            <!-- Search Box -->
+            <form action="{{ url_for('search') }}" method="GET" class="mb-5">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="Search for posts..." required>
+                    <button class="btn btn-primary" type="submit">Secure Search</button>
+                    <!-- This button overrides the form's action and sends the data to the vulnerable endpoint -->
+                    <button class="btn btn-danger" type="submit" formaction="{{ url_for('search_vulnerable') }}">Vulnerable Search</button>
+                </div>
+            </form>
+
+            <!-- Blog Posts -->
+            {% if posts %}
+                {% for post in posts %}
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="card-title">{{ post[1] }}</h2>
+                        <h6 class="card-subtitle mb-2 text-muted">by {{ post[3] }} on {{ post[4].strftime('%Y-%m-%d') }}</h6>
+                        <p class="card-text">{{ post[2][:200] }}...</p> {# Show a preview of the content #}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">No posts found.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
