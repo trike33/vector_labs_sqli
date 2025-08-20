@@ -1,0 +1,6 @@
+# Database configuration
+# Replace these values with your actual MySQL database credentials.
+mysql_host: 'localhost'
+mysql_user: 'accesspoint'
+mysql_password: 'toor'
+mysql_db: 'flask_blog_app'
