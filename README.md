@@ -30,8 +30,7 @@ Make sure you have all the files in the following structure:
 
 If you don't have MySQL installed, follow the instructions for your operating system.
 
-    Ubuntu/Debian: `sudo apt update && sudo apt install mysql-server`. If needed you can install MySQL development headers and a couple of build tools with: `sudo apt update && sudo apt install pkg-config default-libmysqlclient-dev build-essential`
-
+    Ubuntu/Debian: `sudo apt update && sudo apt install mysql-server build-essential pkg-config python3-dev default-libmysqlclient-dev`.
     macOS (using Homebrew): `brew install mysql`
 
     Windows: Download the installer from the official MySQL website.
