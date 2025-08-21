@@ -1,4 +1,6 @@
-# Python Flask Blog & User Management Web App
+![](https://github.com/trike33/vector_labs_sqli/blob/main/accesspoint_logo.png)
+
+# Python Flask Blog Web App
 
 This is a simple, professional-looking web application built with Python and the Flask framework. It connects to a MySQL database and features a public blog page with search functionality, a login system, and a protected admin page for managing users.
 
@@ -18,6 +20,7 @@ Make sure you have all the files in the following structure:
 |-- setup_db.py
 |-- requirements.txt
 |-- db.yaml
+|-- accesspoint_logo.png
 |-- /templates
     |-- layout.html
     |-- index.html
