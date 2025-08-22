@@ -132,6 +132,7 @@ def delete_user(user_id):
     flash('User has been deleted.', 'success')
     return redirect(url_for('users'))
 
+# --- SECURE FUNCTION ---
 @app.route('/search')
 def search():
     search_query = request.args.get('q')
@@ -153,6 +154,7 @@ def search():
     
     return render_template('search_results.html', posts=posts, query=search_query)
 
+# --- ERROR-BASED and UNION-BASED VULNERABLE FUNCTION ---
 @app.route('/search_vulnerable')
 def search_vulnerable():
     search_query = request.args.get('q')
@@ -175,6 +177,51 @@ def search_vulnerable():
     
     return render_template('search_results.html', posts=posts, query=search_query)
 
+# --- TIME-BASED VULNERABLE FUNCTION ---
+@app.route('/search_time_based')
+def search_time_based():
+    search_query = request.args.get('q')
+    if not search_query:
+        search_query = "default" # Ensure query is never empty
+
+    cur = mysql.connection.cursor()
+
+    # VULNERABILITY: The input is directly embedded in the query.
+    query = f"SELECT id, title FROM posts WHERE author = '{search_query}'"
+    
+    app.logger.info(f"Executing TIME-BASED VULNERABLE query: {query}")
+    
+    cur.execute(query)
+    posts = cur.fetchall()
+    cur.close()
+    
+    # This page will always look the same, forcing the attacker to use time.
+    return "Search complete."
+
+# --- BOOLEAN-BASED VULNERABLE FUNCTION ---
+@app.route('/search_boolean_based')
+def search_boolean_based():
+    search_query = request.args.get('q')
+    if not search_query:
+        search_query = "default"
+
+    cur = mysql.connection.cursor()
+
+    # VULNERABILITY: The input is directly embedded in the query.
+    query = f"SELECT id, title FROM posts WHERE title = '{search_query}'"
+    
+    app.logger.info(f"Executing BOOLEAN-BASED VULNERABLE query: {query}")
+    
+    cur.execute(query)
+    posts = cur.fetchall()
+    cur.close()
+    
+    # The page content changes based on the result
+    if posts:
+        return "Results found!"
+    else:
+        return "No results."
+        
 @app.route('/logout')
 @login_required
 def logout():
