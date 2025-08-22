@@ -1,5 +1,4 @@
-# app.py
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, get_flashed_messages
 from flask_mysqldb import MySQL
 import yaml
 import hashlib # Import hashlib for MD5
@@ -10,7 +9,6 @@ from functools import wraps
 app = Flask(__name__)
 
 # --- Logging Configuration ---
-# This will print logs to the console, including our custom SQL query logs.
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
@@ -132,7 +130,6 @@ def delete_user(user_id):
     flash('User has been deleted.', 'success')
     return redirect(url_for('users'))
 
-# --- SECURE FUNCTION ---
 @app.route('/search')
 def search():
     search_query = request.args.get('q')
@@ -154,7 +151,6 @@ def search():
     
     return render_template('search_results.html', posts=posts, query=search_query)
 
-# --- ERROR-BASED and UNION-BASED VULNERABLE FUNCTION ---
 @app.route('/search_vulnerable')
 def search_vulnerable():
     search_query = request.args.get('q')
@@ -162,66 +158,64 @@ def search_vulnerable():
         return redirect(url_for('index'))
 
     cur = mysql.connection.cursor()
-
-    # The vulnerability is here: using an f-string to directly inject user input.
-    # An attacker could provide input like: ' OR 1=1; --
-    # This would change the query to SELECT ... WHERE title LIKE '%' OR 1=1; -- %'
-    # which would return all posts from the database.
     query = f"SELECT id, title, content, author, created_at FROM posts WHERE title LIKE '%{search_query}%'"
+    app.logger.info(f"Executing VULNERABLE query: {query}")
     
-   # app.logger.info(f"Executing VULNERABLE query: {query}")
-    cur.execute(query) # The user input is executed as part of the command
-    
-    posts = cur.fetchall()
+    try:
+        cur.execute(query)
+        posts = cur.fetchall()
+    except Exception as e:
+        flash(f"Database Error: {e}", "danger")
+        app.logger.error(f"SQL Error on vulnerable search: {e}")
+        posts = []
+
     cur.close()
+    
+    if not posts and 'Database Error' not in str(get_flashed_messages()):
+        flash(f"No results found for '{search_query}'", 'warning')
     
     return render_template('search_results.html', posts=posts, query=search_query)
 
-# --- TIME-BASED VULNERABLE FUNCTION ---
+# --- TIME-BASED VULNERABLE FUNCTION (UPDATED) ---
 @app.route('/search_time_based')
 def search_time_based():
-    search_query = request.args.get('q')
-    if not search_query:
-        search_query = "default" # Ensure query is never empty
-
+    search_query = request.args.get('q', 'default')
     cur = mysql.connection.cursor()
-
-    # VULNERABILITY: The input is directly embedded in the query.
     query = f"SELECT id, title FROM posts WHERE author = '{search_query}'"
-    
     app.logger.info(f"Executing TIME-BASED VULNERABLE query: {query}")
     
-    cur.execute(query)
-    posts = cur.fetchall()
-    cur.close()
+    try:
+        cur.execute(query)
+    except Exception as e:
+        # Log the error for the developer but don't show it to the user.
+        app.logger.error(f"SQL Error on time-based search: {e}")
     
-    # This page will always look the same, forcing the attacker to use time.
+    cur.close()
     return "Search complete."
 
-# --- BOOLEAN-BASED VULNERABLE FUNCTION ---
+# --- BOOLEAN-BASED VULNERABLE FUNCTION (UPDATED) ---
 @app.route('/search_boolean_based')
 def search_boolean_based():
-    search_query = request.args.get('q')
-    if not search_query:
-        search_query = "default"
-
+    search_query = request.args.get('q', 'default')
+    posts = None
     cur = mysql.connection.cursor()
-
-    # VULNERABILITY: The input is directly embedded in the query.
     query = f"SELECT id, title FROM posts WHERE title = '{search_query}'"
-    
     app.logger.info(f"Executing BOOLEAN-BASED VULNERABLE query: {query}")
     
-    cur.execute(query)
-    posts = cur.fetchall()
+    try:
+        cur.execute(query)
+        posts = cur.fetchall()
+    except Exception as e:
+        # Log the error but don't show it. The 'posts' variable will remain None.
+        app.logger.error(f"SQL Error on boolean-based search: {e}")
+
     cur.close()
     
-    # The page content changes based on the result
     if posts:
         return "Results found!"
     else:
         return "No results."
-        
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -230,5 +224,4 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    # Debug mode provides verbose errors in the browser
     app.run(debug=True)
