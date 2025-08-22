@@ -9,10 +9,14 @@
             <!-- Search Box -->
             <form action="{{ url_for('search') }}" method="GET" class="mb-5">
                 <div class="input-group">
-                    <input type="text" name="q" class="form-control" placeholder="Search for posts..." required>
+                    <input type="text" name="q" class="form-control" placeholder="Search for posts or enter payload..." required>
                     <button class="btn btn-primary" type="submit">Secure Search</button>
-                    <!-- This button overrides the form's action and sends the data to the vulnerable endpoint -->
-                    <button class="btn btn-danger" type="submit" formaction="{{ url_for('search_vulnerable') }}">Vulnerable Search</button>
+                </div>
+                <div class="input-group mt-2">
+                    <!-- These buttons override the form's action and send the data to the vulnerable endpoints -->
+                    <button class="btn btn-danger" type="submit" formaction="{{ url_for('search_vulnerable') }}">Error-Based</button>
+                    <button class="btn btn-warning" type="submit" formaction="{{ url_for('search_time_based') }}">Time-Based</button>
+                    <button class="btn btn-info" type="submit" formaction="{{ url_for('search_boolean_based') }}">Boolean-Based</button>
                 </div>
             </form>
 
