@@ -161,17 +161,13 @@ def search_vulnerable():
     query = f"SELECT id, title, content, author, created_at FROM posts WHERE title LIKE '%{search_query}%'"
     app.logger.info(f"Executing VULNERABLE query: {query}")
     
-    try:
-        cur.execute(query)
-        posts = cur.fetchall()
-    except Exception as e:
-        flash(f"Database Error: {e}", "danger")
-        app.logger.error(f"SQL Error on vulnerable search: {e}")
-        posts = []
+    # Removed the try...except block to allow Flask's debugger to show the full error
+    cur.execute(query)
+    posts = cur.fetchall()
 
     cur.close()
     
-    if not posts and 'Database Error' not in str(get_flashed_messages()):
+    if not posts:
         flash(f"No results found for '{search_query}'", 'warning')
     
     return render_template('search_results.html', posts=posts, query=search_query)
